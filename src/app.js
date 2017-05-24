@@ -9,6 +9,34 @@ import {
 import './app.css';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.onChangeInput = this.onChangeInput.bind(this);
+    this.onKeyPressEnter = this.onKeyPressEnter.bind(this);
+    this.search = this.search.bind(this);
+
+    this.state = {
+      query: '',
+    };
+  }
+
+  onChangeInput(event) {
+    this.setState({
+      query: event.target.value,
+    });
+  }
+
+  onKeyPressEnter(event) {
+    if (event.key === 'Enter') {
+      this.search();
+    }
+  }
+
+  search(event) {
+    console.log('query', this.state.query);
+  }
+
   render() {
     return (
       <div className="app">
@@ -16,10 +44,13 @@ class App extends Component {
         <FormGroup>
           <InputGroup>
             <FormControl
+              value={this.state.query}
               type="text"
               placeholder="Search an Artist ..."
+              onChange={this.onChangeInput}
+              onKeyPress={this.onKeyPressEnter}
             />
-            <InputGroup.Addon>
+            <InputGroup.Addon onClick={this.search}>
               <Glyphicon glyph="search" />
             </InputGroup.Addon>
           </InputGroup>
