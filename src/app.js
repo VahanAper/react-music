@@ -8,8 +8,9 @@ import {
 
 import './app.css';
 import Profile from './profile';
+import Gallery from './gallery';
 
-const BASE_URL = 'https://api.spotify.com/v1/search';
+const BASE_URL = 'https://api.spotify.com/v1';
 const Console = console;
 
 class App extends Component {
@@ -23,6 +24,7 @@ class App extends Component {
     this.state = {
       query: '',
       artist: null,
+      tracks: [],
     };
   }
 
@@ -39,21 +41,28 @@ class App extends Component {
   }
 
   search() {
-    const FETCH_URL = `${BASE_URL}?q=${this.state.query}&type=artist&limit=1`;
+    let FETCH_URL = `${BASE_URL}/search?q=${this.state.query}&type=artist&limit=1`;
 
-    fetch(FETCH_URL, {
-      method: 'GET',
-    })
+    fetch(FETCH_URL, { method: 'GET' })
       .then(response => response.json())
       .then((json) => {
         if (json.artists.items.length > 0) {
           const artist = json.artists.items[0];
           this.setState({ artist });
+
+          FETCH_URL = `${BASE_URL}/artists/${artist.id}/top-tracks?country=US`;
+          fetch(FETCH_URL, { method: 'GET' })
+            .then(response => response.json())
+            .then((data) => {
+              const { tracks } = data;
+              this.setState({ tracks });
+            })
+            .catch(err => Console.error(err));
         } else {
           Console.warn('No artist was found');
         }
       })
-      .catch(err => Console.log('ERROR', err));
+      .catch(err => Console.error(err));
   }
 
   render() {
@@ -74,10 +83,16 @@ class App extends Component {
             </InputGroup.Addon>
           </InputGroup>
         </FormGroup>
-        <Profile artist={this.state.artist} />
-        <div className="gallery">
-          Gallery
-        </div>
+        {
+          this.state.artist !== null
+            ?
+              <div>
+                <Profile artist={this.state.artist} />
+                <Gallery tracks={this.state.tracks} />
+              </div>
+            :
+              <div />
+        }
       </div>
     );
   }

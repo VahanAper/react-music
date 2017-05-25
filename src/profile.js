@@ -23,12 +23,16 @@ class Profile extends Component {
         />
         <div className="profile-info">
           <div className="profile-name">{artist.name}</div>
-          <div className="profile-followers">{artist.followers.total} followers</div>
+          <div className="profile-followers">
+            {artist.followers.total} followers
+          </div>
           <div className="profile-genres">
             {
               artist.genres.map((genre, i) => {
                 const key = `key_${i}`;
-                const genreText = genre !== artist.genres[artist.genres.length - 1] ? ` ${genre},` : ` ${genre}`;
+                const genreText = genre !== artist.genres[artist.genres.length - 1]
+                  ? ` ${genre},`
+                  : ` ${genre}`;
                 return (
                   <span key={key}>{genreText}</span>
                 );
