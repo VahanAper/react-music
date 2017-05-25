@@ -7,6 +7,10 @@ import {
 } from 'react-bootstrap';
 
 import './app.css';
+import Profile from './profile';
+
+const BASE_URL = 'https://api.spotify.com/v1/search';
+const Console = console;
 
 class App extends Component {
   constructor(props) {
@@ -18,6 +22,7 @@ class App extends Component {
 
     this.state = {
       query: '',
+      artist: null,
     };
   }
 
@@ -33,8 +38,22 @@ class App extends Component {
     }
   }
 
-  search(event) {
-    console.log('query', this.state.query);
+  search() {
+    const FETCH_URL = `${BASE_URL}?q=${this.state.query}&type=artist&limit=1`;
+
+    fetch(FETCH_URL, {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then((json) => {
+        if (json.artists.items.length > 0) {
+          const artist = json.artists.items[0];
+          this.setState({ artist });
+        } else {
+          Console.warn('No artist was found');
+        }
+      })
+      .catch(err => Console.log('ERROR', err));
   }
 
   render() {
@@ -55,10 +74,7 @@ class App extends Component {
             </InputGroup.Addon>
           </InputGroup>
         </FormGroup>
-        <div className="profile">
-          <div>Artist Picture</div>
-          <div>Artist Name</div>
-        </div>
+        <Profile artist={this.state.artist} />
         <div className="gallery">
           Gallery
         </div>
